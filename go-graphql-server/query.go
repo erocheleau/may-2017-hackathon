@@ -48,7 +48,7 @@ func DoQuery(q string) QueryResponse {
 	uri := "https://cloudplatform.coveo.com/rest/search/v2/?access_token=7b9b9300-3901-437b-bafd-51ae596f1b16&q=" + q
 
 	resp, err := http.Get(uri)
-	fmt.Println("Uri: " + uri)
+	// fmt.Println("Uri: " + uri)
 	if err != nil {
 		fmt.Print(err)
 		panic(err)

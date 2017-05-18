@@ -4,47 +4,15 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+var schema, _ = graphql.NewSchema(
+	graphql.SchemaConfig{
+		Query: getQueryType(),
+	},
+)
+
 func getQueryType() *graphql.Object {
 
-	resultFields := DoGetFields()
-	fields := graphql.Fields{
-		"UniqueId": &graphql.Field{
-			Type:        graphql.ID,
-			Description: "The result UniqueId",
-		},
-		"Title": &graphql.Field{
-			Type:        graphql.String,
-			Description: "The result title",
-		},
-	}
-
-	for _, f := range resultFields.Fields {
-		fieldName := f.Name[1:len(f.Name)]
-
-		fields[fieldName] = &graphql.Field{
-			Type:        graphql.String,
-			Description: f.Description,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return p.Source.(QueryResponseResult).Raw[fieldName], nil
-			},
-		}
-	}
-
-	fields["Title"] = &graphql.Field{
-		Type:        graphql.String,
-		Description: "The result title",
-	}
-
-	fields["UniqueId"] = &graphql.Field{
-		Type:        graphql.ID,
-		Description: "The result UniqueId",
-	}
-
-	resultInterface := graphql.NewObject(graphql.ObjectConfig{
-		Name:        "Result",
-		Description: "A search result",
-		Fields:      fields,
-	})
+	resultsSchema := InitResultsSchema()
 
 	queryResultObject := graphql.NewObject(graphql.ObjectConfig{
 		Name:        "Result",
@@ -59,7 +27,7 @@ func getQueryType() *graphql.Object {
 			},
 
 			"results": &graphql.Field{
-				Type:        graphql.NewList(resultInterface),
+				Type:        graphql.NewList(resultsSchema),
 				Description: "The list of results",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					return p.Source.(QueryResponse).Results, nil
@@ -86,5 +54,38 @@ func getQueryType() *graphql.Object {
 				},
 			},
 		},
+	})
+}
+
+func InitResultsSchema() *graphql.Object {
+	resultFields := DoGetFields()
+	fields := graphql.Fields{}
+
+	for _, f := range resultFields.Fields {
+		fieldName := f.Name[1:len(f.Name)]
+
+		fields[fieldName] = &graphql.Field{
+			Type:        graphql.String,
+			Description: f.Description,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return p.Source.(QueryResponseResult).Raw[fieldName], nil
+			},
+		}
+	}
+
+	fields["Title"] = &graphql.Field{
+		Type:        graphql.String,
+		Description: "The result title",
+	}
+
+	fields["UniqueId"] = &graphql.Field{
+		Type:        graphql.ID,
+		Description: "The result UniqueId",
+	}
+
+	return graphql.NewObject(graphql.ObjectConfig{
+		Name:        "Result",
+		Description: "A search result",
+		Fields:      fields,
 	})
 }
