@@ -1,26 +1,49 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/graphql-go/graphql"
 )
 
 func getQueryType() *graphql.Object {
+
+	resultFields := DoGetFields()
+	fields := graphql.Fields{
+		"UniqueId": &graphql.Field{
+			Type:        graphql.ID,
+			Description: "The result UniqueId",
+		},
+		"Title": &graphql.Field{
+			Type:        graphql.String,
+			Description: "The result title",
+		},
+	}
+
+	for _, f := range resultFields.Fields {
+		fieldName := f.Name[1:len(f.Name)]
+
+		fields[fieldName] = &graphql.Field{
+			Type:        graphql.String,
+			Description: f.Description,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return p.Source.(QueryResponseResult).Raw[fieldName], nil
+			},
+		}
+	}
+
+	fields["Title"] = &graphql.Field{
+		Type:        graphql.String,
+		Description: "The result title",
+	}
+
+	fields["UniqueId"] = &graphql.Field{
+		Type:        graphql.ID,
+		Description: "The result UniqueId",
+	}
+
 	resultInterface := graphql.NewObject(graphql.ObjectConfig{
 		Name:        "Result",
 		Description: "A search result",
-		Fields: graphql.Fields{
-			"UniqueId": &graphql.Field{
-				Type:        graphql.ID,
-				Description: "The result UniqueId",
-			},
-			"Title": &graphql.Field{
-				Type:        graphql.String,
-				Description: "The result title",
-			},
-		},
+		Fields:      fields,
 	})
 
 	queryResultObject := graphql.NewObject(graphql.ObjectConfig{
@@ -39,13 +62,6 @@ func getQueryType() *graphql.Object {
 				Type:        graphql.NewList(resultInterface),
 				Description: "The list of results",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-
-					b, err := json.Marshal(p.Source.(QueryResponse))
-					if err != nil {
-						fmt.Println(err)
-					}
-					fmt.Println(string(b))
-
 					return p.Source.(QueryResponse).Results, nil
 				},
 			},
