@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import logo from '../../logo.svg';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import { graphql, gql } from 'react-apollo'
 
 import './App.css';
-import {Querybox} from '../querybox/Querybox';
+import { Querybox } from '../querybox/Querybox';
 
 injectTapEventPlugin();
 
@@ -20,8 +21,17 @@ class App extends Component {
           <p className="App-intro">
             Searching for 'Example Search Term'
           </p>
+          <p className="App-intro">
+            {this.props.data.loading &&
+              <p>LOADING</p>
+            }
+
+            {!this.props.data.loading &&
+              <p>{this.props.data.queryResults.totalCount}</p>
+            }
+          </p>
           <div className="search-section">
-            <Querybox/>
+            <Querybox />
           </div>
         </div>
       </MuiThemeProvider>
@@ -29,4 +39,10 @@ class App extends Component {
   }
 }
 
-export default App;
+const AppWithData = graphql(gql`{
+    queryResults(q: "event") {
+      totalCount
+    }  
+}`, { options: { notifyOnNetworkStatusChange: true } })(App);
+
+export default AppWithData;
