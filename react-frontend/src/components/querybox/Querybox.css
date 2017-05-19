@@ -1,0 +1,16 @@
+.querybox-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 10px;
+    border: 1px solid #222;
+    border-radius: 3px;
+    display: flex;
+}
+
+.querybox-search-icon {
+      padding: 0 10px;
+}
+
+.querybox-input-container {
+  width: 100%;
+}
