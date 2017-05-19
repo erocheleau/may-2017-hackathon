@@ -17,6 +17,10 @@ func StartServer(port string) {
 
 	router.Get("/graphql", GraphQLGETHandler)
 	router.Post("/graphql", GraphQLPOSTHandler)
+	router.SetGlobalCors(&vestigo.CorsAccessControl{
+		AllowOrigin:  []string{"*"},
+		AllowHeaders: []string{"Content-type"},
+	})
 
 	// Serve
 	log.Fatal(http.ListenAndServe(port, router))

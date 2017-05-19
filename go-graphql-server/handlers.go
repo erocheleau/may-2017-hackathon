@@ -10,7 +10,9 @@ import (
 )
 
 type QueryPost struct {
-	Query string `json:"query"`
+	Query         string                 `json:"query"`
+	OperationName string                 `json:"operationName"`
+	Variables     map[string]interface{} `json:"variables"`
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -69,26 +71,22 @@ func GraphQLPOSTHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; chartype: utf-8")
 	w.WriteHeader(200)
+	fmt.Println(queryPost.Query)
+	fmt.Println(queryPost.OperationName)
+	fmt.Println(queryPost.Variables)
 
 	result := graphql.Do(graphql.Params{
-		Schema:        schema,
-		RequestString: queryPost.Query,
+		Schema:         schema,
+		RequestString:  queryPost.Query,
+		OperationName:  queryPost.OperationName,
+		VariableValues: queryPost.Variables,
 	})
 
-	if result.HasErrors() {
-		b, err := json.Marshal(result.Errors)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		fmt.Fprint(w, string(b))
-	} else {
-		b, err := json.Marshal(result.Data)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Fprint(w, string(b))
+	b, err := json.Marshal(result)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
+	fmt.Fprint(w, string(b))
+
 }
