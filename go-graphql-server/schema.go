@@ -83,6 +83,11 @@ func InitResultsSchema() *graphql.Object {
 		Description: "The result UniqueId",
 	}
 
+	fields["Excerpt"] = &graphql.Field{
+		Type:        graphql.ID,
+		Description: "The result excerpt",
+	}
+
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "Result",
 		Description: "A search result",

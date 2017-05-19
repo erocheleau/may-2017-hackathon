@@ -22,6 +22,7 @@ type QueryResponse struct {
 type QueryResponseResult struct {
 	Title    string                 `json: "title"`
 	UniqueId string                 `json: "UniqueId"`
+	Excerpt  string                 `json: "excerpt"`
 	Raw      map[string]interface{} `json: "raw"`
 }
 
