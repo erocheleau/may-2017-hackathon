@@ -19,32 +19,40 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func GraphQLGETHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("totlo")
 	query, err := url.ParseQuery(r.URL.RawQuery)
+	fmt.Println("totlo2")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Errorf("Error parsing query: ", err.Error())
 		return
 	}
-
+	fmt.Println("totlo3")
 	w.Header().Set("Content-Type", "application/json; chartype: utf-8")
 	w.WriteHeader(200)
 	for _, value := range query {
-		//fmt.Fprintf(w, "Query: %s => %s ", key, value)
 		result := graphql.Do(graphql.Params{
 			Schema:        schema,
 			RequestString: value[0],
 		})
 
-		if result.Errors != nil {
-			fmt.Fprintf(w, "%v", result.Errors)
-		}
+		if result.HasErrors() {
+			b, err := json.Marshal(result.Errors)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
-		b, err := json.Marshal(result.Data)
-		if err != nil {
-			fmt.Println(err)
-			return
+			fmt.Fprint(w, string(b))
+		} else {
+			b, err := json.Marshal(result.Data)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			fmt.Fprint(w, string(b))
 		}
-		fmt.Fprint(w, string(b))
 	}
 }
 func GraphQLPOSTHandler(w http.ResponseWriter, r *http.Request) {
@@ -67,14 +75,20 @@ func GraphQLPOSTHandler(w http.ResponseWriter, r *http.Request) {
 		RequestString: queryPost.Query,
 	})
 
-	if result.Errors != nil {
-		fmt.Fprintf(w, "%v", result.Errors)
-	}
+	if result.HasErrors() {
+		b, err := json.Marshal(result.Errors)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-	b, err := json.Marshal(result.Data)
-	if err != nil {
-		fmt.Println(err)
-		return
+		fmt.Fprint(w, string(b))
+	} else {
+		b, err := json.Marshal(result.Data)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Fprint(w, string(b))
 	}
-	fmt.Fprint(w, string(b))
 }
