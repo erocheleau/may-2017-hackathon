@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { gql, graphql } from 'react-apollo';
 
+import './Resultlist.css';
+
 const ResultList = ({ data: { loading, error, queryResults } }) => {
   if (loading) {
     return <p> Loading ... </p>
@@ -10,10 +12,14 @@ const ResultList = ({ data: { loading, error, queryResults } }) => {
   }
 
   return (
-    <ul> {
-      queryResults.results.map(res => <li key={res.UniqueId}>{res.title}</li>)
+    <div className="result-list-container"> {
+      queryResults.results.map(res => 
+        <div className="result-container">
+          <a href={res.clickableuri}>{res.title}</a><br/>
+          <span>{res.Excerpt}</span>
+        </div>)
     }
-    </ul>
+    </div>
   )
 }
 
@@ -21,7 +27,8 @@ const resultListQuery = gql`{
 queryResults(q: "event") {
     results {
       title
-      UniqueId
+      clickableuri
+      Excerpt
     }
   }
 }`;

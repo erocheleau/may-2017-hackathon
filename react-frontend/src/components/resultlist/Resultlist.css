@@ -1,0 +1,11 @@
+.result-container {
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin: 10px;
+}
+
+.result-list-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
