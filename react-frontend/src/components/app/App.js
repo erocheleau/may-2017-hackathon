@@ -6,6 +6,7 @@ import { graphql, gql } from 'react-apollo'
 
 import './App.css';
 import { Querybox } from '../querybox/Querybox';
+import { ResultListWithData } from '../resultlist/Resultlist';
 
 injectTapEventPlugin();
 
@@ -32,6 +33,10 @@ class App extends Component {
           </p>
           <div className="search-section">
             <Querybox />
+          </div>
+
+          <div className="result-list">
+            <ResultListWithData />
           </div>
         </div>
       </MuiThemeProvider>
